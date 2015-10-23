@@ -2,6 +2,7 @@ package com.appvoyage.poscript.api.client;
 
 import java.util.List;
 
+import com.appvoyage.poscript.api.http.POScriptHttpClient;
 import com.appvoyage.poscript.api.model.Customer;
 import com.appvoyage.poscript.api.model.CustomerSearchCriteria;
 import com.appvoyage.poscript.api.model.Merchant;
@@ -15,71 +16,51 @@ import com.appvoyage.poscript.api.model.PaymentStatus;
 public class SimplePOScriptClient implements POScriptClient {
 
 	private POScriptClientConfig clientConfig;
+	private POScriptHttpClient httpClient;
 
 	public SimplePOScriptClient(POScriptClientConfig clientConfig) {
 		this.clientConfig = clientConfig;
+		this.httpClient = new POScriptHttpClient(clientConfig);
 	}
 
-	@Override
 	public List<POSVendorConfig> getSupportedPOSVendors() {
-		// TODO Auto-generated method stub
-		return null;
+		return httpClient.getSupportedPOSVendors();
 	}
 
-	@Override
 	public POSVendorConfig getPOSVendor(POSVendor posVendor) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Merchant getMerchant() {
-		// TODO Auto-generated method stub
-		return null;
+		return httpClient.getMerchantInfo();
 	}
 
-	@Override
 	public List<Customer> getAllCustomers() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Customer getCustomer(String customerId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Customer createCustomer(Customer customer) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public Customer searchCustomers(
-			CustomerSearchCriteria customerSearchCriteria) {
-		// TODO Auto-generated method stub
+	public Customer searchCustomers(CustomerSearchCriteria customerSearchCriteria) {
 		return null;
 	}
 
-	@Override
 	public List<Order> getAllOrders(String customerId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public List<Order> getCustomerOrders(OrderSearchCriteria orderSearchCriteria) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public PaymentStatus makePayment(Order order, Payment payment) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
 }

@@ -3,8 +3,7 @@ package com.appvoyage.poscript.api.model;
 public class Merchant {
 
 	private String merchantId;
-	private String firstName;
-	private String lastName;
+	private String merchantName;
 	private String mobile;
 	private String businessName;
 	private String email;
@@ -17,22 +16,14 @@ public class Merchant {
 		this.merchantId = merchantId;
 	}
 	
-	public String getFirstName() {
-		return firstName;
+	public String getMerchantName() {
+		return merchantName;
 	}
-	
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+
+	public void setMerchantName(String merchantName) {
+		this.merchantName = merchantName;
 	}
-	
-	public String getLastName() {
-		return lastName;
-	}
-	
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	
+
 	public String getMobile() {
 		return mobile;
 	}
