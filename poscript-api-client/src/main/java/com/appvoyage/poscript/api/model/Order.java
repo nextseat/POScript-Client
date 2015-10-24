@@ -69,4 +69,7 @@ public class Order {
 		this.orderStatus = orderStatus;
 	}
 	
+	public String toString() {
+		return "[id=" + id + ", total=" + total + "]";
+	}
 }

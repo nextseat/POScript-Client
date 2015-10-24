@@ -48,15 +48,15 @@ public class SimplePOScriptClient implements POScriptClient {
 	}
 
 	public Customer searchCustomers(CustomerSearchCriteria customerSearchCriteria) {
-		return null;
+		return httpClient.searchCustomer(customerSearchCriteria.getMobile());
 	}
 
-	public List<Order> getAllOrders(String customerId) {
+	public List<Order> getAllMerchantOrders() {
 		return null;
 	}
 
 	public List<Order> getCustomerOrders(OrderSearchCriteria orderSearchCriteria) {
-		return null;
+		return httpClient.getCustomerOrders(orderSearchCriteria.getCustomerId());
 	}
 
 	public PaymentStatus makePayment(Order order, Payment payment) {

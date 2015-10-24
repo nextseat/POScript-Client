@@ -40,7 +40,7 @@ public interface POScriptClient {
 	public Customer searchCustomers(CustomerSearchCriteria customerSearchCriteria);
 
     //get /poscript/{version}/merchants/{merchantId}/orders 
-	public List<Order> getAllOrders(String customerId);
+	public List<Order> getAllMerchantOrders();
 	
     //get /poscript/{version}/merchants/{merchantId}/customers/{customerId}/orders
 	public List<Order> getCustomerOrders(OrderSearchCriteria orderSearchCriteria);

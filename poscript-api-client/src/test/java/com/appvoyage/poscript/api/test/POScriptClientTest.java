@@ -11,6 +11,7 @@ import com.appvoyage.poscript.api.model.Customer;
 import com.appvoyage.poscript.api.model.CustomerSearchCriteria;
 import com.appvoyage.poscript.api.model.Merchant;
 import com.appvoyage.poscript.api.model.Order;
+import com.appvoyage.poscript.api.model.OrderSearchCriteria;
 import com.appvoyage.poscript.api.model.POSVendor;
 import com.appvoyage.poscript.api.model.Payment;
 import com.appvoyage.poscript.api.model.PaymentStatus;
@@ -43,7 +44,7 @@ public class POScriptClientTest {
 		
 		//Create Customer
 		String mobile = "+1987654321";
-		Customer newCustomer = client.createCustomer(new Customer("Sagar Golla", mobile));
+		Customer newCustomer = client.createCustomer(new Customer("Sagar", "Golla", mobile));
 		System.out.println("Newly created customer - " + newCustomer.getCustomerId() + " > " + newCustomer.getCustomerName());
 		
 		
@@ -60,7 +61,8 @@ public class POScriptClientTest {
 		
 		
 		//Find latest orders
-		List<Order> orders = client.getAllOrders(foundCustomer.getCustomerId());
+		OrderSearchCriteria orderSearchCriteria = new OrderSearchCriteria(foundCustomer.getCustomerId());
+		List<Order> orders = client.getCustomerOrders(orderSearchCriteria);
 		Order latestOrder = orders.get(0);
 		
 

@@ -48,4 +48,7 @@ public class Merchant {
 		this.email = email;
 	}
 	
+	public String toString() {
+		return "[id=" + merchantId + ", " + merchantName + "]";
+	}
 }
