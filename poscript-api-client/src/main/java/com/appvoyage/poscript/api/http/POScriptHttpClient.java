@@ -1,17 +1,20 @@
 package com.appvoyage.poscript.api.http;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,8 +24,11 @@ import com.appvoyage.poscript.api.client.POScriptClientConfig;
 import com.appvoyage.poscript.api.model.Customer;
 import com.appvoyage.poscript.api.model.Merchant;
 import com.appvoyage.poscript.api.model.Order;
+import com.appvoyage.poscript.api.model.Order.OrderStatus;
 import com.appvoyage.poscript.api.model.OrderItem;
 import com.appvoyage.poscript.api.model.POSVendorConfig;
+import com.appvoyage.poscript.api.model.Payment;
+import com.appvoyage.poscript.api.model.PaymentStatus;
 
 @SuppressWarnings("unchecked")
 public class POScriptHttpClient {
@@ -39,8 +45,8 @@ public class POScriptHttpClient {
 		this.clientConfig = clientConfig;
 	}
 	
-	protected String getBaseUrl() {
-		return (clientConfig.getEndPoint() != null ? clientConfig.getEndPoint() : POSCRIPT_BASE_URL) + "?pos_action=";
+	protected String getBaseUrl(String posAction) {
+		return (clientConfig.getEndPoint() != null ? clientConfig.getEndPoint() : POSCRIPT_BASE_URL) + "?pos_action=" + posAction;
 	}
 	
 	protected void setCommonHeaders(HttpRequestBase request) {
@@ -82,13 +88,21 @@ public class POScriptHttpClient {
 		return new Response(statusCode, responseStr);
 	}
 
-	public Response post(String url, String payload) {
+	public Response post(String url, String payload, Map<String, String> params) {
 		int statusCode = 500;
 		String responseStr = null;
 		try {
 			HttpPost request = new HttpPost(url);
 			setCommonHeaders(request);
-			request.setEntity(new StringEntity(payload));
+			if (payload != null) {
+				request.setEntity(new StringEntity(payload));	
+			} else {
+				List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+				for (String key : params.keySet()) {
+					parameters.add(new BasicNameValuePair(key, params.get(key)));
+				}
+				request.setEntity(new UrlEncodedFormEntity(parameters));
+			}
 
 			HttpResponse response = client.execute(request);
 			statusCode = response.getStatusLine().getStatusCode();
@@ -106,7 +120,7 @@ public class POScriptHttpClient {
 	
 	public Merchant getMerchantInfo() {
 		Merchant merchant = new Merchant();
-		String url = getBaseUrl() + "merchant_info";
+		String url = getBaseUrl("merchant_info");
 		Response response = get(url);
 		JSONObject responseJSON = (JSONObject) JSONValue.parse(response.response);
 		merchant.setMerchantId(responseJSON.get("id") == null ? null : responseJSON.get("id").toString());
@@ -116,7 +130,7 @@ public class POScriptHttpClient {
 	}
 	
 	public Customer searchCustomer(String phoneNumber) {
-		String url = getBaseUrl() + "search_customer";
+		String url = getBaseUrl("search_customer");
 		Response response = get(url);
 		JSONObject responseJSON = (JSONObject) JSONValue.parse(response.response);
 		JSONArray customersJSONArray = (JSONArray) responseJSON.get("elements");
@@ -157,32 +171,32 @@ public class POScriptHttpClient {
 		return customer;
 	}
 	
-	public Response createCustomer(String lastName, String firstName, String phone, String emailAddress) {
-		JSONObject requestPayload = new JSONObject();
-		requestPayload.put("lastName", lastName != null ? lastName : "");
-		requestPayload.put("firstName", firstName);
+	public Customer createCustomer(Customer customer) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("lastName", customer.getLastName());
+		params.put("firstName", customer.getFirstName());
+		params.put("phoneNumber", customer.getMobile());
+		params.put("emailAddress", customer.getEmailAddress());
+
+		String url = getBaseUrl("create_customer");
+		Response response = post(url, null, params);
+		JSONObject responseJSON = (JSONObject) JSONValue.parse(response.response);
 		
-		JSONArray phoneNumbers = new JSONArray();
-		JSONObject phoneNumber = new JSONObject();
-		phoneNumber.put("phoneNumber", phone);
-		phoneNumbers.add(phoneNumber);
-		requestPayload.put("phoneNumbers", phoneNumbers);
-		
-		JSONObject email = new JSONObject();
-		email.put("emailAddress", emailAddress != null ? emailAddress : "");
-		JSONArray emailAddresses = new JSONArray();
-		emailAddresses.add(email);
-		requestPayload.put("emailAddresses", emailAddresses);
-		
-		String payload = requestPayload.toJSONString();
-		String url = getBaseUrl() + "create_customer";
-		return post(url, payload);
+		customer.setCustomerId(String.valueOf(responseJSON.get("id")));
+		return customer;
 	}
 	
+	public List<Customer> getAllCustomers() {
+		return null;
+	}
+	
+	public Customer getCustomer(String customerId) {
+		return null;
+	}
 	
 	public List<Order> getCustomerOrders(String customerId) {
 		List<Order> orders = new ArrayList<Order>();
-		String url = getBaseUrl() + "customer_orders&customerId=" + customerId;
+		String url = getBaseUrl("customer_orders") + "&customerId=" + customerId;
 		Response response = get(url);
 		
 		JSONObject responseJSON = (JSONObject) JSONValue.parse(response.response);
@@ -197,6 +211,7 @@ public class POScriptHttpClient {
 			
 			if (state != null && state.equals("open")) {
 				order = new Order();
+				order.setOrderStatus(OrderStatus.OPEN);
 				order.setId(String.valueOf(orderJSON.get("id")));
 				order.setCurrency(String.valueOf(orderJSON.get("currency")));
 				order.setTotal(Long.parseLong(String.valueOf(orderJSON.get("total"))));
@@ -210,7 +225,7 @@ public class POScriptHttpClient {
 		//"manualTransaction": false, "groupLineItems": true, "testMode": false, "createdTime": 1440525579000, "clientCreatedTime": 1440525578000, "modifiedTime": 1440525587000, "device": {"id": "3aeb21b1-e1e7-483a-80a0-858824a038d6"}}], "href": "https://api.clover.com:443/v3/merchants/HWAGW2SWS9E7G/orders?filter=customer.id%3DRA66D9R6X0ZTP&filter=stateIS%20NOT%20NULL&limit=100"}
 		
 		if (order != null) {
-			url = getBaseUrl() + "order_line_items&orderId=" + order.getId();
+			url = getBaseUrl("order_line_items") + "&orderId=" + order.getId();
 			response = get(url);
 			
 			responseJSON = (JSONObject) JSONValue.parse(response.response);
@@ -243,5 +258,21 @@ public class POScriptHttpClient {
 		}
 		
 		return orders;
+	}
+	
+	
+	public PaymentStatus makePayment(Order order, Payment payment) {
+		Map<String, String> params = new HashMap<String, String>();
+		for (String key : payment.getPaymentAttributes().keySet()) {
+			params.put(key, payment.getPaymentAttributes().get(key).toString());
+		}
+		
+		String url = getBaseUrl("pay_order");
+		Response response = post(url, null, params);
+		JSONObject responseJSON = (JSONObject) JSONValue.parse(response.response);
+		String result = String.valueOf(responseJSON.get("status"));
+		
+		PaymentStatus status = new PaymentStatus(result, result);
+		return status;
 	}
 }

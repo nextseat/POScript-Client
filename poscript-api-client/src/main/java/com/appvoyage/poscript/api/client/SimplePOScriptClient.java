@@ -36,15 +36,15 @@ public class SimplePOScriptClient implements POScriptClient {
 	}
 
 	public List<Customer> getAllCustomers() {
-		return null;
+		return httpClient.getAllCustomers();
 	}
 
 	public Customer getCustomer(String customerId) {
-		return null;
+		return httpClient.getCustomer(customerId);
 	}
 
 	public Customer createCustomer(Customer customer) {
-		return null;
+		return httpClient.createCustomer(customer);
 	}
 
 	public Customer searchCustomers(CustomerSearchCriteria customerSearchCriteria) {
@@ -60,7 +60,9 @@ public class SimplePOScriptClient implements POScriptClient {
 	}
 
 	public PaymentStatus makePayment(Order order, Payment payment) {
-		return null;
+		payment.getPaymentAttributes().put("total", order.getTotal());
+		payment.getPaymentAttributes().put("orderId", order.getId());
+		return httpClient.makePayment(order, payment);
 	}
 	
 }

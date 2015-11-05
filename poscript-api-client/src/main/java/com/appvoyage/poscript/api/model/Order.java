@@ -9,6 +9,10 @@ public class Order {
 		OPEN,
 		PAYED;
 		
+		public boolean isOpen() {
+			return this == OPEN;
+		}
+		
 		public boolean isPayed() {
 			return this == PAYED;
 		}
@@ -70,6 +74,6 @@ public class Order {
 	}
 	
 	public String toString() {
-		return "[id=" + id + ", total=" + total + "]";
+		return "Order[id=" + id + ", total=" + total + "]";
 	}
 }

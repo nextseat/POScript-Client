@@ -3,16 +3,19 @@ package com.appvoyage.poscript.api.model;
 import java.util.Map;
 
 public class Payment {
-	private long total;
+	private PaymentType paymentType;
+	private Map<String, Object> paymentAttributes;
 
 	public Payment(PaymentType paymentType, Map<String, Object> paymentAttributes) {
+		this.paymentType = paymentType;
+		this.paymentAttributes = paymentAttributes;
 	}
 
-	public long getTotal() {
-		return total;
+	public PaymentType getPaymentType() {
+		return paymentType;
 	}
 
-	public void setTotal(long total) {
-		this.total = total;
+	public Map<String, Object> getPaymentAttributes() {
+		return paymentAttributes;
 	}
 }

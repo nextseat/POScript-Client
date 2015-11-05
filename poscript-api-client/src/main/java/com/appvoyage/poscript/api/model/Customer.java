@@ -6,6 +6,7 @@ public class Customer {
 	private String firstName;
 	private String lastName;
 	private String mobile;
+	private String emailAddress;
 
 	public Customer() {}
 	public Customer(String firstName, String lastName, String mobile) {
@@ -48,6 +49,14 @@ public class Customer {
 	
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
+	}
+	
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
 	}
 	
 	public String toString() {
